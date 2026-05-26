@@ -1,5 +1,8 @@
 # *The Archivist's Assistant*
 
+## Instructions
+Simply download it from the green "Code" button up the top, unzip it and double-click "Archivist's Assistant.bat" - it will prompt you for everything else.
+
 ## Why did I make this?
 My group's been obsessed with The Magnus Archives lately, but we always find ourselves going back and forth between episodes to figure out where we've heard a name before, or reading transcripts because we couldn't hear what was being said in an episode - so I made a tool that allows us to search through and find what we want to know **without** the threat of spoilers.
 
