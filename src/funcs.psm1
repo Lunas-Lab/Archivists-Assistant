@@ -1,3 +1,4 @@
+Import-Module "$PSScriptRoot\Version.psm1"
 function Get-UserInput {
     param (
         [string] $Prompt = " ",
@@ -111,4 +112,12 @@ function Write-Intro {
     Start-Sleep -Milliseconds 800
     Write-Host "Hello, Archivist."
     Start-Sleep -Milliseconds 700
+}
+
+function Find-Update {
+    $Response = Invoke-WebRequest -Uri "https://github.com/Lunas-Lab/Archivists-Assistant/raw/master/src/Version.psm1"
+    if ([version] $Response.Content.Split('"')[1] -gt $Version) {
+        Write-Host "Need to update!"
+    }
+    Write-Host "No update needed!" -BackgroundColor Green -ForegroundColor White
 }
