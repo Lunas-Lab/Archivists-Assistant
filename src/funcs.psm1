@@ -115,9 +115,21 @@ function Write-Intro {
 }
 
 function Find-Update {
-    $Response = Invoke-WebRequest -Uri "https://github.com/Lunas-Lab/Archivists-Assistant/raw/master/src/Version.psm1"
+    $Response = Invoke-WebRequest -Uri "https://github.com/Lunas-Lab/Archivists-Assistant/raw/master/src/Version.psm1" -UseBasicParsing
     if ([version] $Response.Content.Split('"')[1] -gt $Version) {
-        Write-Host "Need to update!"
+        Write-Host "There is an update for Archivists Assistant available." -BackgroundColor Yellow -ForegroundColor White
+        $ShouldUpdate = Get-UserInput -Prompt "Would you like to update now? (y/n)" `
+            -ErrorMessage "Please only enter `"y`" for `"yes`" or `"n`" for `"no`"" `
+            -CheckMethod { $args[0] -iin "y", "n" }
+        if ($ShouldUpdate -ieq "y") {
+            Install-Update
+            Exit
+        }
     }
-    Write-Host "No update needed!" -BackgroundColor Green -ForegroundColor White
+}
+
+function Install-Update {
+    & "..\MinGit\cmd\git.exe" "fetch" "--all"
+    & "..\MinGit\cmd\git.exe" "reset" "--hard" "origin/master"
+    & ".\Archivists Assistant.bat"
 }

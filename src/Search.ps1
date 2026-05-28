@@ -1,5 +1,5 @@
 Import-Module ".\src\funcs.psm1"
-
+Find-Update
 Write-Intro
 
 $MaxEpisode = Get-UserInput -Prompt "Please enter which tape you'd like to search up to" `
