@@ -20,15 +20,32 @@ Do {
     switch ($Command[0]) {
         "f" {
             $SearchString = Get-UserInput -Prompt "Please enter the text you wish to search for"
+            $SearchInMetadata = (Get-UserInput -Prompt "Would you like to search in archive metadata (y) or only body text (n)?" `
+                    -ErrorMessage "You may only enter a `"y`" or an `"n`"" `
+                    -CheckMethod { $args[0] -iin "y", "n" }) -ieq "y"
+
+            Write-Host "Okay, searching for " -NoNewline
+            Write-Host $SearchString -BackgroundColor Blue -ForegroundColor White -NoNewline
+            Write-Host " in the archives, " -NoNewline
+            if ($SearchInMetadata) {
+                Write-Host "including" -BackgroundColor Green -ForegroundColor White -NoNewline
+            }
+            else {
+                Write-Host "excluding" -BackgroundColor Red -ForegroundColor White -NoNewline
+            }
+            Write-Host " in metadata."
             $FoundTapes = Invoke-Find -MaxTape $MaxEpisode -SearchString $SearchString
             
             if (!$FoundTapes) {
                 Write-Host "No archives were found containing " -NoNewline
                 Write-Host $SearchString -BackgroundColor Yellow -ForegroundColor White
+                break
             }
 
             foreach ($Tape in $FoundTapes) {
-                Get-TapeContent -TapeNumber $Tape -GetTitle
+                if (($SearchInMetadata -and $Tape.MatchInMetadata) -or !($Tape.MatchInMetadata)) {
+                    Get-TapeContent -TapeNumber $Tape.Index -GetTitle
+                }
             }
         }
         "e" {
@@ -46,8 +63,17 @@ Do {
                 -ErrorMessage "Spoilers, Archivist! Only enter a number between 1 and $MaxEpisode." `
                 -CheckMethod { (($args[0] -ge 1) -and ($args[0] -le $MaxEpisode)) } `
                 -IsInt
-            & ".\src\glow_2.1.2_Windows_x86_64\glow.exe" (Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName
+            $ViewMetadata = (Get-UserInput -Prompt "Would you like metadata to be included at the top of the statement? (y/n)" `
+                    -ErrorMessage "You may only enter a `"y`" or an `"n`"" `
+                    -CheckMethod { $args[0] -iin "y", "n" }) -eq "y"
+            if ($ViewMetadata) {
+            & ".\src\leaf.exe" (Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName
+            }
+            else {
+                ((Get-Content -Path ((Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName) -Raw) -split "---")[2] | .\src\leaf.exe
+                
+            }
         }
     }
 
-} while ($true)
+} while ($true) 

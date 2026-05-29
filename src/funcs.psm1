@@ -32,6 +32,15 @@ function Get-UserInput {
     $Result
 }
 
+function Select-MarkdownMetadata {
+    param (
+        [string] $Markdown
+    )
+
+    $Metadata = ($Markdown | Select-String -Pattern "(?s)---(.*?)---").Matches.Value
+    $Metadata
+}
+
 function Find-TapesContaining {
     param (
         [string] $SearchString,
@@ -42,9 +51,19 @@ function Find-TapesContaining {
     $TapesContainingString = @()
     foreach ($Tape in (Get-ChildItem -Path ".\src\Transcripts\")) {
         if ($CurrentTape -ge $MaxTape) { break }
-        $TapeContent = Get-Content -Path $Tape.FullName
+
+        $TapeContent = Get-Content -Path $Tape.FullName -Raw
+        $TapeMetadata = Select-MarkdownMetadata -Markdown $TapeContent
         if ($TapeContent -like ("*" + $SearchString + "*")) {
-            $TapesContainingString += ($CurrentTape + 1)
+            $TapeData = [pscustomobject]@{
+                    Index = ($CurrentTape + 1)
+                    Content = $TapeContent
+                    MatchInMetadata = $false
+                }
+            if ($TapeMetadata -like ("*" + $SearchString + "*")) {
+                $TapeData.MatchInMetadata = $true
+            }
+            $TapesContainingString += $TapeData
         }
         $CurrentTape ++
     }
@@ -93,10 +112,10 @@ function Invoke-Find {
 }
 
 function Write-Intro {
-    Write-Host " __  __                               _____           _   _ _         _" -ForegroundColor Green
+    Write-Host " __  __                               _____           _   _ _         _       " -ForegroundColor Green
     Write-Host "|  \/  |                             |_   _|         | | (_) |       | |      " -ForegroundColor Green
     Write-Host "| \  / | __ _  __ _ _ __  _   _ ___    | |  _ __  ___| |_ _| |_ _   _| |_ ___ " -ForegroundColor Green
-    Write-Host "| |\/| |/ _` |/ _` | '_ \| | | / __|   | | | '_ \/ __| __| | __| | | | __/ _ \" -ForegroundColor Green
+    Write-Host "| |\/| |/ _`` |/ _`` | '_ \| | | / __|   | | | '_ \/ __| __| | __| | | | __/ _ \" -ForegroundColor Green
     Write-Host "| |  | | (_| | (_| | | | | |_| \__ \  _| |_| | | \__ \ |_| | |_| |_| | ||  __/" -ForegroundColor Green
     Write-Host "|_|  |_|\__,_|\__, |_| |_|\__,_|___/ |_____|_| |_|___/\__|_|\__|\__,_|\__\___|" -ForegroundColor Green
     Write-Host "                 / |                                                          " -ForegroundColor Green
@@ -105,13 +124,13 @@ function Write-Intro {
     Write-Host ""
     Write-Host "Loading" -NoNewline -BackgroundColor Blue
     Write-Host "." -NoNewline
-    Start-Sleep -Milliseconds 1000
+    Start-Sleep -Milliseconds 500
     Write-Host "." -NoNewline
-    Start-Sleep -Milliseconds 1000
+    Start-Sleep -Milliseconds 500
     Write-Host "."
-    Start-Sleep -Milliseconds 800
+    Start-Sleep -Milliseconds 300
     Write-Host "Hello, Archivist."
-    Start-Sleep -Milliseconds 700
+    Start-Sleep -Milliseconds 200
 }
 
 function Find-Update {
