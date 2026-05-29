@@ -1,5 +1,7 @@
 Import-Module ".\src\funcs.psm1"
-Find-Update
+if (Test-Connection -Quiet -ComputerName "google.com" -Count 1) {
+    Find-Update
+}
 Write-Intro
 
 $MaxEpisode = Get-UserInput -Prompt "Please enter which tape you'd like to search up to" `
@@ -43,7 +45,10 @@ Do {
             }
 
             foreach ($Tape in $FoundTapes) {
-                if (($SearchInMetadata -and $Tape.MatchInMetadata) -or !($Tape.MatchInMetadata)) {
+                if ($SearchInMetadata -and ($Tape.MatchInMetadata -or $Tape.MatchInBody)) {
+                    Get-TapeContent -TapeNumber $Tape.Index -GetTitle
+                }
+                if (!$SearchInMetadata -and $Tape.MatchInBody) {
                     Get-TapeContent -TapeNumber $Tape.Index -GetTitle
                 }
             }
@@ -67,7 +72,7 @@ Do {
                     -ErrorMessage "You may only enter a `"y`" or an `"n`"" `
                     -CheckMethod { $args[0] -iin "y", "n" }) -eq "y"
             if ($ViewMetadata) {
-            & ".\src\leaf.exe" (Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName
+                & ".\src\leaf.exe" (Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName
             }
             else {
                 ((Get-Content -Path ((Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName) -Raw) -split "---")[2] | .\src\leaf.exe

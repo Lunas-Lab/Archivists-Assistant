@@ -58,6 +58,7 @@ function Find-TapesContaining {
             $TapeData = [pscustomobject]@{
                     Index = ($CurrentTape + 1)
                     Content = $TapeContent
+                    MatchInBody = $true
                     MatchInMetadata = $false
                 }
             if ($TapeMetadata -like ("*" + $SearchString + "*")) {
@@ -129,6 +130,7 @@ function Write-Intro {
     Start-Sleep -Milliseconds 500
     Write-Host "."
     Start-Sleep -Milliseconds 300
+    Write-Host ""
     Write-Host "Hello, Archivist."
     Start-Sleep -Milliseconds 200
 }
