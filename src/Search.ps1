@@ -75,7 +75,7 @@ Do {
                 & ".\src\leaf.exe" (Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName
             }
             else {
-                ((Get-Content -Path ((Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName) -Raw) -split "---")[2] | .\src\leaf.exe
+                ((Get-Content -Path ((Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName) -Raw) -split "`n---`n")[1] | .\src\leaf.exe
                 
             }
         }

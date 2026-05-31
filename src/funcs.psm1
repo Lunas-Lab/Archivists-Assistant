@@ -37,7 +37,7 @@ function Select-MarkdownMetadata {
         [string] $Markdown
     )
 
-    $Metadata = ($Markdown | Select-String -Pattern "(?s)---(.*?)---").Matches.Value
+    $Metadata = ($Markdown | Select-String -Pattern "(?s)---\n(.*?)\n---\n").Matches.Value
     $Metadata
 }
 
