@@ -21,7 +21,7 @@ Do {
 
     switch ($Command[0]) {
         "f" {
-            $SearchString = Get-UserInput -Prompt "Please enter the text you wish to search for"
+            $SearchString = Get-UserInput -Prompt "Please enter the text you wish to search for" | Find-Yaoi
             $SearchInMetadata = (Get-UserInput -Prompt "Would you like to search in archive metadata (y) or only body text (n)?" `
                     -ErrorMessage "You may only enter a `"y`" or an `"n`"" `
                     -CheckMethod { $args[0] -iin "y", "n" }) -ieq "y"

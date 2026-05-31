@@ -167,7 +167,7 @@ function Write-Intro {
 function Find-Update {
     $Response = Invoke-WebRequest -Uri "https://github.com/Lunas-Lab/Archivists-Assistant/raw/master/src/Version.psm1" -UseBasicParsing
     if ([version] $Response.Content.Split('"')[1] -gt $Version) {
-        Write-Host "There is an update for Archivists Assistant available." -BackgroundColor Yellow -ForegroundColor White
+        Write-Host "There is an update for Archivists Assistant available." -BackgroundColor DarkYellow -ForegroundColor White
         $ShouldUpdate = Get-UserInput -Prompt "Would you like to update now? (y/n)" `
             -ErrorMessage "Please only enter `"y`" for `"yes`" or `"n`" for `"no`"" `
             -CheckMethod { $args[0] -iin "y", "n" }
@@ -182,4 +182,45 @@ function Install-Update {
     & "..\MinGit\cmd\git.exe" "fetch" "--all"
     & "..\MinGit\cmd\git.exe" "reset" "--hard" "origin/master"
     & ".\Archivists Assistant.bat"
+}
+
+function Find-Yaoi {
+    [cmdletBinding()]
+    param (
+        [Parameter(ValueFromPipeline = $true)]
+        [string] $SearchString
+    )
+
+    if ($SearchString -ieq "yaoi") {
+        Clear-Host
+        Write-Host "Ohhhh Archivist... feeling a certain kind of way are we?"
+        Start-Sleep -Milliseconds 1000
+        Clear-Host
+        [Console]::BackgroundColor = "Red"
+        [Console]::ForegroundColor = "Red"
+        Clear-Host
+        Start-Sleep -Milliseconds 900
+        [Console]::BackgroundColor = "Yellow"
+        [Console]::ForegroundColor = "Yellow"
+        Clear-Host
+        Start-Sleep -Milliseconds 900
+        [Console]::BackgroundColor = "Green"
+        [Console]::ForegroundColor = "Green"
+        Clear-Host
+        Start-Sleep -Milliseconds 900
+        [Console]::BackgroundColor = "Blue"
+        [Console]::ForegroundColor = "Blue"
+        Clear-Host
+        Start-Sleep -Milliseconds 900
+        [Console]::BackgroundColor = "Magenta"
+        [Console]::ForegroundColor = "Magenta"
+        Clear-Host
+        Start-Sleep -Milliseconds 900
+        [Console]::BackgroundColor = "Black"
+        [Console]::ForegroundColor = "White"
+        Clear-Host
+    }
+    
+    $SearchString
+
 }
