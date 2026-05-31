@@ -1,5 +1,23 @@
 Import-Module "$PSScriptRoot\Version.psm1"
 function Get-UserInput {
+    <#
+    .SYNOPSIS
+    Gets and checks input from user
+    .DESCRIPTION
+    Prompts the user for input with the message provided, checks the input with the function provided and will write the error message provided to the console if the check fails. Sends response to pipeline once user gives valid input. Optional switch to return an integer
+    .PARAMETER Prompt
+    What you'd like for the function to prompt the user with
+    .PARAMETER ErrorMessage
+    What you'd like for the function to prompt the user with if they provide invalid input
+    .PARAMETER CheckMethod
+    The function you'd like to be used to check if input is valid - pass by value
+    .PARAMETER IsInt
+    Optional switch to make the function convert input to an integer
+    .EXAMPLE
+    $Text = Get-UserInput -Prompt "Please choose if you'd like [r]ed, [g]reen or [b]lue" `
+                          -ErrorMessage "Please only input `"r`", `"g`" or `"b`"."
+                          -CheckMethod {$args[0] -iin "r", "g", "b"}
+    #>
     param (
         [string] $Prompt = " ",
         [string] $ErrorMessage,
@@ -33,11 +51,22 @@ function Get-UserInput {
 }
 
 function Select-MarkdownMetadata {
+    <#
+    .DESCRIPTION
+    Extracts the YAML from a MarkDown-formatted string#
+    .SYNOPSIS
+    Takes Markdown-formatted string as an input and outputs YAML in it if present, otherwise throws System.ArgumentException and returns $null
+    .PARAMETER Markdown
+    Markdown-formatted string to have th YAML extracted from
+    #>
     param (
         [string] $Markdown
     )
 
     $Metadata = ($Markdown | Select-String -Pattern "(?s)---\n(.*?)\n---\n").Matches.Value
+    if ($null -eq $Metadata) {
+        throw [System.ArgumentException]"No YAML found in document"
+    }
     $Metadata
 }
 
