@@ -10,11 +10,11 @@ My group's been obsessed with The Magnus Archives lately, but we always find our
 When you open *The Archivist's Assistant* it will ask you which episodes you're up to, and for the rest of the session you won't be exposed to any information past that point so you don't get spoiled. You can opt to *find* a string of text in the archives and it will show you which episodes contain it, or to *read* a specific tape.
 
 ## How was this made?
-It's all coded in PowerShell, which I have been learning for work. Markdown viewing is handled by [glow](https://github.com/charmbracelet/glow). All code was written by hand over a few days (**no dirty AI slop here**). I'm very much aware that the code is formatted horrendously, and I'll refactor it at some point to make it presentable, not just functional.
+It's all coded in PowerShell, which I have been learning for work. Markdown viewing is handled by [leaf](https://github.com/rivolink/leaf). The main code of this was written over a few days (by hand - *no dirty AI slop here*), and I've slowly developed it since.
 
 ## Whose resources did I use to make this? (i.e credits)
 ### Thank you to:
-- [snarp](http://snarp.github.io/) for the transcripts in Markdown format, pulled from their [Magnus Archives Transcripts](https://github.com/Snarp/magnus_archives_transcripts) repo
+- [snarp](http://snarp.github.io/) for the transcripts in Markdown format, pulled from their [Magnus Archives Transcripts](https://github.com/Snarp/magnus_archives_transcripts) repository
 - [Rusty Quill Network](https://rustyquill.com) for making [The Magnus Archives](https://rustyquill.com/show/the-magnus-archives/)
-- [charmbracelet](https://github.com/charmbracelet) for [glow](https://github.com/charmbracelet/glow), the markdown viewer that this uses
+- [RivoLink](https://github.com/RivoLink) for [leaf](https://github.com/rivolink/leaf), the markdown viewer that this uses
 - My beautiful girlfriend August and our friend Squeek for the encouragement to make this during their D&D sessions
