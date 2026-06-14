@@ -76,27 +76,27 @@ function Find-TapesContaining {
         [int] $MaxTape
     )
     
-    $CurrentTape = 0
     $TapesContainingString = @()
-    foreach ($Tape in (Get-ChildItem -Path ".\src\Transcripts\")) {
-        if ($CurrentTape -ge $MaxTape) { break }
 
-        $TapeContent = Get-Content -Path $Tape.FullName -Raw
-        $TapeMetadata = Select-MarkdownMetadata -Markdown $TapeContent
-        if ($TapeContent -like ("*" + $SearchString + "*")) {
-            $TapeData = [pscustomobject]@{
-                    Index = ($CurrentTape + 1)
-                    Content = $TapeContent
-                    MatchInBody = $true
+    for ($TapeIndex = 1; $TapeIndex -le $MaxTape; $TapeIndex++) {
+        $MatchObject = [pscustomobject]@{
+                    Index = ($TapeIndex)
+                    MatchInBody = $false
                     MatchInMetadata = $false
                 }
-            if ($TapeMetadata -like ("*" + $SearchString + "*")) {
-                $TapeData.MatchInMetadata = $true
+
+                if ((Get-TapeContent -TapeNumber $TapeIndex -ContentType Body) -like "*$SearchString*") {
+                    $MatchObject.MatchInBody = $true
+                }
+                if ((Get-TapeContent -TapeNumber $TapeIndex -ContentType Metadata) -like "*$SearchString*") {
+                    $MatchObject.MatchInMetadata = $true
+                }
+
+            if ($MatchObject.MatchInBody -or $MatchObject.MatchInMetadata) {
+                $TapesContainingString += $MatchObject
             }
-            $TapesContainingString += $TapeData
-        }
-        $CurrentTape ++
     }
+
 
     $TapesContainingString
 }
@@ -104,41 +104,20 @@ function Find-TapesContaining {
 function Get-TapeContent {
     param (
         [int] $TapeNumber,
-        [switch] $GetTitle
+        [ValidateSet('Body', 'Metadata', 'Title', 'All')]
+        [string] $ContentType
     )
 
-    $TapePath = (Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName
-    if ($GetTitle) {
-        $Return = ((Select-String -Path $TapePath -Pattern "title")[0].Line -replace "title:", "").Trim() -replace "`"", ""
-    }
-    else {
-        $Return = Get-Content -Path $TapePath
+    $TapeContent = (Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1] | Get-Content -Raw
+
+    switch ($ContentType) {
+        'All' {$Return = $TapeContent  }
+        'Title' {$Return = ($TapeContent | Select-String -Pattern 'title: *"(.*)"').Matches.Groups[1].Value}
+        'Metadata' {$Return = Select-MarkdownMetadata -Markdown $TapeContent}
+        'Body' {$Return = ($TapeContent | Select-String -Pattern '(?s)\n---\n(.*)').Matches[0].Value}
     }
 
     $Return
-}
-
-function Invoke-Find {
-    [CmdletBinding()]
-    param (
-        [Parameter(ValueFromPipeline = $true)]
-        [string] $SearchString,
-        [int] $MaxTape
-    )
-    
-    begin {
-
-    }
-    
-    process {
-        Write-Host "Searching for " -NoNewline
-        Write-Host $SearchString -ForegroundColor White -BackgroundColor Blue
-        $FoundTapes = Find-TapesContaining -SearchString $SearchString -MaxTape $MaxTape
-    }
-    
-    end {
-        $FoundTapes
-    }
 }
 
 function Write-Intro {
@@ -152,16 +131,16 @@ function Write-Intro {
     Write-Host "              |___/                                                           " -ForegroundColor Green
     Write-Host "Est. 1887" -ForegroundColor Green
     Write-Host ""
-    Write-Host "Loading" -NoNewline -BackgroundColor Blue
+    Write-Host "Loading" -NoNewline
     Write-Host "." -NoNewline
-    Start-Sleep -Milliseconds 500
+    Start-Sleep -Milliseconds 200
     Write-Host "." -NoNewline
-    Start-Sleep -Milliseconds 500
+    Start-Sleep -Milliseconds 200
     Write-Host "."
-    Start-Sleep -Milliseconds 300
+    Start-Sleep -Milliseconds 220
     Write-Host ""
     Write-Host "Hello, Archivist."
-    Start-Sleep -Milliseconds 200
+    Start-Sleep -Milliseconds 100
 }
 
 function Find-Update {

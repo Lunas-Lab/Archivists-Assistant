@@ -1,4 +1,5 @@
 Import-Module ".\src\funcs.psm1"
+
 if (Test-Connection -Quiet -ComputerName "google.com" -Count 1) {
     Find-Update
 }
@@ -10,7 +11,7 @@ $MaxEpisode = Get-UserInput -Prompt "Please enter which tape you'd like to searc
     -IsInt
 
 Write-Host "Okay, no information past tape " -NoNewline
-Write-Host $MaxEpisode -NoNewline -ForegroundColor White -BackgroundColor Blue
+Write-Host $MaxEpisode -NoNewline -ForegroundColor Blue
 Write-Host " will be shown."
 
 Write-Host "Enter `"[f]ind`", `"[r]ead`" or `"[e]xit`" to either find text in The Archives, read an archive, or exit the program."
@@ -22,34 +23,43 @@ Do {
     switch ($Command[0]) {
         "f" {
             $SearchString = Get-UserInput -Prompt "Please enter the text you wish to search for" | Find-Yaoi
+            $SearchString = (Get-Culture).TextInfo.ToTitleCase($SearchString.ToLower())
             $SearchInMetadata = (Get-UserInput -Prompt "Would you like to search in archive metadata (y) or only body text (n)?" `
                     -ErrorMessage "You may only enter a `"y`" or an `"n`"" `
                     -CheckMethod { $args[0] -iin "y", "n" }) -ieq "y"
 
             Write-Host "Okay, searching for " -NoNewline
-            Write-Host $SearchString -BackgroundColor Blue -ForegroundColor White -NoNewline
+            Write-Host $SearchString -ForegroundColor Blue -NoNewline
             Write-Host " in the archives, " -NoNewline
             if ($SearchInMetadata) {
-                Write-Host "including" -BackgroundColor Green -ForegroundColor White -NoNewline
+                Write-Host "including" -ForegroundColor Green -NoNewline
             }
             else {
-                Write-Host "excluding" -BackgroundColor Red -ForegroundColor White -NoNewline
+                Write-Host "excluding" -ForegroundColor Red -NoNewline
             }
             Write-Host " in metadata."
-            $FoundTapes = Invoke-Find -MaxTape $MaxEpisode -SearchString $SearchString
+            Write-Host "Searching for " -NoNewline
+            Write-Host $SearchString -ForegroundColor Blue -NoNewline
+            Write-Host "..."
+            $FoundTapes = Find-TapesContaining -SearchString $SearchString -MaxTape $MaxEpisode
             
             if (!$FoundTapes) {
                 Write-Host "No archives were found containing " -NoNewline
-                Write-Host $SearchString -BackgroundColor Yellow -ForegroundColor White
+                Write-Host $SearchString -ForegroundColor Red
                 break
             }
 
+            Write-Host $FoundTapes.Count -ForegroundColor Green -NoNewline
+            Write-Host " matches to " -NoNewline
+            Write-Host $SearchString -ForegroundColor Green -NoNewline
+            Write-Host " found in The Archives"
             foreach ($Tape in $FoundTapes) {
                 if ($SearchInMetadata -and ($Tape.MatchInMetadata -or $Tape.MatchInBody)) {
-                    Get-TapeContent -TapeNumber $Tape.Index -GetTitle
+                    Get-TapeContent -TapeNumber $Tape.Index -ContentType Title
+                    continue
                 }
                 if (!$SearchInMetadata -and $Tape.MatchInBody) {
-                    Get-TapeContent -TapeNumber $Tape.Index -GetTitle
+                    Get-TapeContent -TapeNumber $Tape.Index -ContentType Title
                 }
             }
         }
