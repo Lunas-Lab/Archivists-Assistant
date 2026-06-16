@@ -89,10 +89,10 @@ Do {
                     -ErrorMessage "You may only enter a `"y`" or an `"n`"" `
                     -CheckMethod { $args[0] -iin "y", "n" }) -eq "y"
             if ($ViewMetadata) {
-                & ".\src\leaf.exe" (Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName
+                Get-TapeContent -TapeNumber $TapeNumber -ContentType All | .\src\leaf.exe
             }
             else {
-                ((Get-Content -Path ((Get-ChildItem -Path ".\src\Transcripts")[$TapeNumber - 1].FullName) -Raw) -split "`n---`n")[1] | .\src\leaf.exe
+                Get-TapeContent -TapeNumber $TapeNumber -ContentType Body | .\src\leaf.exe
                 
             }
         }

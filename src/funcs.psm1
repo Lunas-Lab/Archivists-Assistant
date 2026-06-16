@@ -144,7 +144,12 @@ function Write-Intro {
 }
 
 function Find-Update {
-    $Response = Invoke-WebRequest -Uri "https://github.com/Lunas-Lab/Archivists-Assistant/raw/master/src/Version.psm1" -UseBasicParsing
+    $Headers = @{
+    "Cache-Control" = "no-cache, no-store, must-revalidate"
+    "Pragma"        = "no-cache"
+    "Expires"       = "0"
+}
+    $Response = Invoke-WebRequest -Uri "https://github.com/Lunas-Lab/Archivists-Assistant/raw/master/src/Version.psm1" -UseBasicParsing -Headers $Headers
     if ([version] $Response.Content.Split('"')[1] -gt $Version) {
         Write-Host "There is an update for Archivists Assistant available." -BackgroundColor DarkYellow -ForegroundColor White
         $ShouldUpdate = Get-UserInput -Prompt "Would you like to update now? (y/n)" `
