@@ -63,7 +63,7 @@ function Select-MarkdownMetadata {
         [string] $Markdown
     )
 
-    $Metadata = ($Markdown | Select-String -Pattern "(?s)---\n(.*?)\n---\n").Matches.Value
+    $Metadata = ($Markdown | Select-String -Pattern "(?s)---\r?\n(.*?)\r?\n---\r?\n").Matches.Value
     if ($null -eq $Metadata) {
         throw [System.ArgumentException]"No YAML found in document"
     }
@@ -114,7 +114,7 @@ function Get-TapeContent {
         'All' {$Return = $TapeContent  }
         'Title' {$Return = ($TapeContent | Select-String -Pattern 'title: *"(.*)"').Matches.Groups[1].Value}
         'Metadata' {$Return = Select-MarkdownMetadata -Markdown $TapeContent}
-        'Body' {$Return = ($TapeContent | Select-String -Pattern '(?s)\n---\n(.*)').Matches[0].Value}
+        'Body' {$Return = ($TapeContent | Select-String -Pattern '(?s)\r?\n---\r?\n(.*)').Matches[0].Groups[1].Value}
     }
 
     $Return

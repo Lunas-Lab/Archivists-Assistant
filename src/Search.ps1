@@ -49,19 +49,26 @@ Do {
                 break
             }
 
-            Write-Host $FoundTapes.Count -ForegroundColor Green -NoNewline
-            Write-Host " matches to " -NoNewline
-            Write-Host $SearchString -ForegroundColor Green -NoNewline
-            Write-Host " found in The Archives"
+
+            $TapeCount = 0
             foreach ($Tape in $FoundTapes) {
                 if ($SearchInMetadata -and ($Tape.MatchInMetadata -or $Tape.MatchInBody)) {
-                    Get-TapeContent -TapeNumber $Tape.Index -ContentType Title
+                    $TapeTitles += (Get-TapeContent -TapeNumber $Tape.Index -ContentType Title) + "`n"
+                    $TapeCount++
                     continue
                 }
                 if (!$SearchInMetadata -and $Tape.MatchInBody) {
-                    Get-TapeContent -TapeNumber $Tape.Index -ContentType Title
+                    $TapeTitles += (Get-TapeContent -TapeNumber $Tape.Index -ContentType Title) + "`n"
+                    $TapeCount++
                 }
             }
+            Write-Host $TapeCount -ForegroundColor Green -NoNewline
+            Write-Host " matches to " -NoNewline
+            Write-Host $SearchString -ForegroundColor Green -NoNewline
+            Write-Host " found in The Archives"
+            Write-Host $TapeTitles
+
+            $TapeTitles = ""
         }
         "e" {
             $Confirm = Get-UserInput -Prompt "Are you sure you wish to exit? (y/n)" `
