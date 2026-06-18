@@ -151,12 +151,16 @@ function Find-Update {
     "Expires"       = "0"
 }
     $Response = Invoke-WebRequest -Uri "https://github.com/Lunas-Lab/Archivists-Assistant/raw/master/src/Version.psm1" -UseBasicParsing -Headers $Headers
-    if ([version] $Response.Content.Split('"')[1] -gt $Version) {
+    $RemoteVersion = $Response.Content.Split('"')[1]
+    if ([version] $RemoteVersion -gt $Version) {
         Write-Host "There is an update for Archivists Assistant available." -BackgroundColor DarkYellow -ForegroundColor White
         $ShouldUpdate = Get-UserInput -Prompt "Would you like to update now? (y/n)" `
             -ErrorMessage "Please only enter `"y`" for `"yes`" or `"n`" for `"no`"" `
             -CheckMethod { $args[0] -iin "y", "n" }
         if ($ShouldUpdate -ieq "y") {
+            Write-Host "Installing version " -NoNewline
+            Write-Host "$RemoteVersion" -ForegroundColor DarkMagenta -NoNewline
+            Write-Host "..."
             Install-Update
             Exit
         }
