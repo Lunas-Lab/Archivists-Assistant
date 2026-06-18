@@ -14,11 +14,11 @@ Write-Host "Okay, no information past tape " -NoNewline
 Write-Host $MaxEpisode -NoNewline -ForegroundColor Blue
 Write-Host " will be shown."
 
-Write-Host "Enter `"[f]ind`", `"[r]ead`" or `"[e]xit`" to either find text in The Archives, read an archive, or exit the program."
+Write-Host "Enter `"[f]ind`", `"[r]ead`", `"[l]ist`", `"[o]pen`" or `"[e]xit`" to either find text in The Archives, read an archive, list the tapes you've read so far, open a tape/the homepage in your browser or exit the program."
 
 Do {
-    $Command = Get-UserInput -ErrorMessage "Please only enter `"find`", `"exit`", `"read`", `"f`", `"e`" or `"r`"" `
-        -CheckMethod { $args[0] -iin ("find", "exit", "read", "f", "e", "r") }
+    $Command = Get-UserInput -ErrorMessage "Please only enter `"find`", `"exit`", `"read`", `"list`", `"open`", `"f`", `"e`", `"r`", `"l`" or `"o`"" `
+        -CheckMethod { $args[0] -iin ("find", "exit", "read", "list", "open", "f", "e", "r", "l", "o") }
 
     switch ($Command[0]) {
         "f" {
@@ -95,6 +95,22 @@ Do {
                 Get-TapeContent -TapeNumber $TapeNumber -ContentType Body | .\src\leaf.exe
                 
             }
+        }
+        "l" {
+            for ($TapeIndex = 1; $TapeIndex -le $MaxEpisode; $TapeIndex++) {
+                Get-TapeContent -TapeNumber $TapeIndex -ContentType Title
+            }
+        }
+
+        "o" {
+            $TapeIndex = Get-UserInput -Prompt "Please enter the number of the episode you wish to open in your browser, or just press enter to open the homepage" `
+                            -ErrorMessage "Please only input a number or press enter, and ensure you're only looking for an episode you have listened to already" `
+                            -CheckMethod {($args[0] -le $MaxEpisode)} `
+                            -IsInt
+            $TapeNumber = Get-TapeContent -TapeNumber $TapeIndex -ContentType Number
+            if ($TapeIndex -eq 0) {Start-Process "https://snarp.github.io/magnus_archives_transcripts/"; break}
+            else {Start-Process "https://snarp.github.io/magnus_archives_transcripts/episode/$TapeNumber.html"}
+            
         }
     }
 

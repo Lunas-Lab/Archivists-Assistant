@@ -104,7 +104,7 @@ function Find-TapesContaining {
 function Get-TapeContent {
     param (
         [int] $TapeNumber,
-        [ValidateSet('Body', 'Metadata', 'Title', 'All')]
+        [ValidateSet('Body', 'Metadata', 'Title', 'All', 'Number')]
         [string] $ContentType
     )
 
@@ -115,6 +115,7 @@ function Get-TapeContent {
         'Title' {$Return = ($TapeContent | Select-String -Pattern 'title: *"(.*)"').Matches.Groups[1].Value}
         'Metadata' {$Return = Select-MarkdownMetadata -Markdown $TapeContent}
         'Body' {$Return = ($TapeContent | Select-String -Pattern '(?s)\r?\n---\r?\n(.*)').Matches[0].Groups[1].Value}
+        'Number' {$Return = ($TapeContent | Select-String -Pattern 'episode_number:.*(\d\d\d).*').Matches.Groups[1].Value}
     }
 
     $Return
